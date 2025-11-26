@@ -25,8 +25,8 @@ A collection of reusable GitHub Actions for **AWS** and **GCP** cloud services. 
 
 ### 💾 Storage
 
-- **[url-to-s3](https://github.com/predictr-io/url_to_s3)** - Download files from URLs and upload to Amazon S3
-- **[url-to-gcs](https://github.com/predictr-io/url-to-gcs)** - Download files from URLs and upload to Google Cloud Storage
+- **[url-to-s3](https://github.com/predictr-io/url_to_s3)** - Stream data from URLs to Amazon S3
+- **[url-to-gcs](https://github.com/predictr-io/url-to-gcs)** - Stream data from URLs to Google Cloud Storage
 
 ### 📊 Data & Analytics
 
