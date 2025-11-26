@@ -12,7 +12,65 @@ Production-grade GitHub Actions that let you:
 - **Clean up automatically** with matching delete actions
 - **Move fast** with simple, focused actions that do one thing well
 
+## 🤔 Why Use These Actions?
+
+**"Why not just run `aws` commands in a script step?"**
+
+Good question! Here's why actions are better:
+
+### ✅ **Better Developer Experience**
+- **Type-safe inputs** - Catch mistakes before runtime
+- **Clear error messages** - Know exactly what went wrong, no cryptic AWS errors
+- **Self-documenting** - Your workflow explains what it does
+- **IDE support** - Autocomplete and validation in your editor
+
+### ✅ **Cleaner Workflows**
+```yaml
+# ❌ Script approach - hard to read, easy to break
+- run: |
+    aws sqs create-queue --queue-name test-queue \
+      --attributes VisibilityTimeout=60,MessageRetentionPeriod=345600 \
+      --tags Environment=test,Team=backend
+    QUEUE_URL=$(aws sqs get-queue-url --queue-name test-queue --query 'QueueUrl' --output text)
+    echo "queue_url=$QUEUE_URL" >> $GITHUB_OUTPUT
+
+# ✅ Action approach - obvious and maintainable
+- uses: predictr-io/aws-sqs-create-queue@v0
+  id: queue
+  with:
+    queue-name: 'test-queue'
+    visibility-timeout: '60'
+    tags: '{"Environment": "test", "Team": "backend"}'
+```
+
+### ✅ **Consistent & Reusable**
+- Same patterns across all AWS services
+- No need to remember AWS CLI syntax for each service
+- Copy examples from README, adapt, done
+- Works the same way in every repository
+
+### ✅ **Built-in Best Practices**
+- Proper error handling and retries
+- Input validation before hitting AWS
+- Output formatting ready for next steps
+- LocalStack support out of the box
+
+### ✅ **No AWS CLI Installation**
+- Actions use AWS SDK directly (faster, smaller)
+- No need to install/update CLI tools
+- Consistent AWS SDK versions
+- Better performance in GitHub Actions runners
+
+### ✅ **Tested & Maintained**
+- Each action has its own test suite
+- Bugs fixed once, benefit everyone
+- Version pinning for stability
+- Active maintenance and updates
+
 ## 📦 Available Actions
+
+### Amazon CloudWatch
+- **[aws-cloudwatch-put-metrics](https://github.com/predictr-io/aws-cloudwatch-put-metrics)** - Publish custom metrics (track deployments, build times, test results)
 
 ### Amazon SQS
 - **[aws-sqs-create-queue](https://github.com/predictr-io/aws-sqs-create-queue)** - Create standard & FIFO queues
@@ -71,6 +129,15 @@ jobs:
         run: |
           export QUEUE_URL="${{ steps.queue.outputs.queue-url }}"
           npm test
+
+      # Track metrics
+      - name: Record test completion
+        if: always()
+        uses: predictr-io/aws-cloudwatch-put-metrics@v0
+        with:
+          namespace: 'MyApp/CI'
+          metric-data: |
+            [{"MetricName": "TestsCompleted", "Value": 1, "Unit": "Count"}]
 
       # Clean up (always runs)
       - name: Delete test queue
