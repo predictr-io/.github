@@ -12,6 +12,10 @@ Production-grade GitHub Actions that let you:
 - **Clean up automatically** with matching delete actions
 - **Move fast** with simple, focused actions that do one thing well
 
+## ✨ Workflow Editor
+
+Want context-aware editing with inline documentation? Try **<a href="https://gate.predictr.io" target="_blank">gate.predictr.io</a>** - a specialized editor for GitHub Actions workflows with built-in parameter documentation and action discovery.
+
 ## 🤔 Why Use These Actions?
 
 **"Why not just run `aws` commands in a script step?"**
@@ -62,7 +66,7 @@ Good question! Here's why actions are better:
 - Better performance in GitHub Actions runners
 
 ### ✅ **Tested & Maintained**
-- Each action has its own test suite
+- Manually tested against real AWS and LocalStack
 - Bugs fixed once, benefit everyone
 - Version pinning for stability
 - Active maintenance and updates
@@ -151,10 +155,6 @@ jobs:
         with:
           queue-url: ${{ steps.queue.outputs.queue-url }}
 ```
-
-## ✨ Workflow Editor
-
-Want context-aware editing with inline documentation? Try **[gate.predictr.io](https://gate.predictr.io)** - a specialized editor for GitHub Actions workflows with built-in parameter documentation and action discovery.
 
 ## 🎯 Design Principles
 
