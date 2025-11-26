@@ -88,6 +88,13 @@ Good question! Here's why actions are better:
 - **[aws-sns-send-message](https://github.com/predictr-io/aws-sns-send-message)** - Publish messages to topics
 - **[aws-sns-delete-topic](https://github.com/predictr-io/aws-sns-delete-topic)** - Clean up test topics
 
+### Google Cloud Pub/Sub
+- **[gcp-pubsub-create-topic](https://github.com/predictr-io/gcp-pubsub-create-topic)** - Create Pub/Sub topics with labels, retention, schemas
+- **[gcp-pubsub-delete-topic](https://github.com/predictr-io/gcp-pubsub-delete-topic)** - Delete Pub/Sub topics
+- **[gcp-pubsub-create-subscription](https://github.com/predictr-io/gcp-pubsub-create-subscription)** - Create pull/push subscriptions
+- **[gcp-pubsub-delete-subscription](https://github.com/predictr-io/gcp-pubsub-delete-subscription)** - Delete subscriptions
+- **[gcp-pubsub-send-message](https://github.com/predictr-io/gcp-pubsub-send-message)** - Publish messages to topics
+
 ### Amazon Kinesis Data Firehose
 - **[aws-firehose-create-stream](https://github.com/predictr-io/aws-firehose-create-stream)** - Create delivery streams (simplified for testing)
 - **[aws-firehose-send-message](https://github.com/predictr-io/aws-firehose-send-message)** - Send records to streams
