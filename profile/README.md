@@ -2,13 +2,13 @@
 
 **Test your data pipelines like you mean it.**
 
-A collection of GitHub Actions for building, testing, and managing cloud-native data workflows. Stop mocking AWS services—spin them up for real in your CI/CD pipeline.
+A collection of GitHub Actions for building, testing, and managing cloud-native data workflows on **AWS** and **GCP**. Stop mocking cloud services—spin them up for real in your CI/CD pipeline.
 
 ## 🚀 What We Build
 
 Production-grade GitHub Actions that let you:
-- **Create real infrastructure** in your workflows (SQS, SNS, Firehose, Glue)
-- **Test against actual services** using LocalStack or AWS
+- **Create real infrastructure** in your workflows (SQS, SNS, Pub/Sub, Firehose, Glue)
+- **Test against actual services** using LocalStack, Pub/Sub Emulator, or real cloud environments
 - **Clean up automatically** with matching delete actions
 - **Move fast** with simple, focused actions that do one thing well
 
@@ -20,13 +20,13 @@ Want context-aware editing with inline documentation? Try **<a href="https://gat
 
 ## 🤔 Why Use These Actions?
 
-**"Why not just run `aws` commands in a script step?"**
+**"Why not just run `aws` or `gcloud` commands in a script step?"**
 
 Good question! Here's why actions are better:
 
 ### ✅ **Better Developer Experience**
 - **Type-safe inputs** - Catch mistakes before runtime
-- **Clear error messages** - Know exactly what went wrong, no cryptic AWS errors
+- **Clear error messages** - Know exactly what went wrong, no cryptic cloud provider errors
 - **Self-documenting** - Your workflow explains what it does
 - **IDE support** - Autocomplete and validation in your editor
 
@@ -50,25 +50,25 @@ Good question! Here's why actions are better:
 ```
 
 ### ✅ **Consistent & Reusable**
-- Same patterns across all AWS services
-- No need to remember AWS CLI syntax for each service
+- Same patterns across all cloud services (AWS & GCP)
+- No need to remember CLI syntax for each service
 - Copy examples from README, adapt, done
 - Works the same way in every repository
 
 ### ✅ **Built-in Best Practices**
 - Proper error handling and retries
-- Input validation before hitting AWS
+- Input validation before hitting cloud APIs
 - Output formatting ready for next steps
-- LocalStack support out of the box
+- Emulator/LocalStack support out of the box
 
-### ✅ **No AWS CLI Installation**
-- Actions use AWS SDK directly (faster, smaller)
+### ✅ **No CLI Installation**
+- Actions use cloud SDKs directly (faster, smaller)
 - No need to install/update CLI tools
-- Consistent AWS SDK versions
+- Consistent SDK versions
 - Better performance in GitHub Actions runners
 
 ### ✅ **Tested & Maintained**
-- Manually tested against real AWS and LocalStack
+- Manually tested against real cloud services and emulators
 - Bugs fixed once, benefit everyone
 - Version pinning for stability
 - Active maintenance and updates
@@ -106,6 +106,7 @@ Good question! Here's why actions are better:
 
 ## 💡 Quick Example
 
+### AWS with LocalStack
 ```yaml
 name: Test Data Pipeline
 
@@ -143,15 +144,6 @@ jobs:
           export QUEUE_URL="${{ steps.queue.outputs.queue-url }}"
           npm test
 
-      # Track metrics
-      - name: Record test completion
-        if: always()
-        uses: predictr-io/aws-cloudwatch-put-metrics@v0
-        with:
-          namespace: 'MyApp/CI'
-          metric-data: |
-            [{"MetricName": "TestsCompleted", "Value": 1, "Unit": "Count"}]
-
       # Clean up (always runs)
       - name: Delete test queue
         if: always()
@@ -165,13 +157,56 @@ jobs:
           queue-url: ${{ steps.queue.outputs.queue-url }}
 ```
 
+### GCP with Pub/Sub Emulator
+```yaml
+name: Test GCP Pipeline
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      pubsub-emulator:
+        image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
+        ports:
+          - 8085:8085
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Create Pub/Sub topic
+      - name: Create topic
+        id: topic
+        uses: predictr-io/gcp-pubsub-create-topic@v0
+        env:
+          PUBSUB_EMULATOR_HOST: localhost:8085
+        with:
+          project-id: 'test-project'
+          topic-name: 'test-topic'
+
+      # Create subscription
+      - name: Create subscription
+        uses: predictr-io/gcp-pubsub-create-subscription@v0
+        env:
+          PUBSUB_EMULATOR_HOST: localhost:8085
+        with:
+          project-id: 'test-project'
+          topic-name: 'test-topic'
+          subscription-name: 'test-sub'
+
+      # Run your tests
+      - name: Test pipeline
+        run: npm test
+```
+
 ## 🎯 Design Principles
 
 - **Simple & Focused** - Each action does one thing well
-- **Test-Friendly** - Works with LocalStack out of the box
-- **Production-Ready** - All actions work with real AWS too
+- **Test-Friendly** - Works with emulators and LocalStack out of the box
+- **Production-Ready** - All actions work with real cloud environments too
 - **Clean Workflows** - Matching create/delete actions for easy cleanup
-- **Consistent** - Same patterns across all services
+- **Multi-Cloud** - Same patterns across AWS and GCP services
 
 ## 🤝 Contributing
 
