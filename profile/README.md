@@ -152,6 +152,10 @@ jobs:
           queue-url: ${{ steps.queue.outputs.queue-url }}
 ```
 
+## ✨ Workflow Editor
+
+Want context-aware editing with inline documentation? Try **[gate.predictr.io](https://gate.predictr.io)** - a specialized editor for GitHub Actions workflows with built-in parameter documentation and action discovery.
+
 ## 🎯 Design Principles
 
 - **Simple & Focused** - Each action does one thing well
