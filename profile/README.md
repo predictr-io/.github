@@ -1,14 +1,16 @@
 # predictr.io GitHub Actions
 
-**Test your data pipelines like you mean it.**
+**Build ML-powered data pipelines in your CI/CD.**
 
-A collection of GitHub Actions for building, testing, and managing cloud-native data workflows on **AWS** and **GCP**. Stop mocking cloud services—spin them up for real in your CI/CD pipeline.
+GitHub Actions for creating **machine learning analyses** (forecasting, customer segmentation, market basket analysis) and building cloud-native data workflows on **AWS** and **GCP**. Stop mocking cloud services—spin them up for real in your CI/CD pipeline.
 
 ## 🚀 What We Build
 
 Production-grade GitHub Actions that let you:
+- **Build ML analyses** in your workflows (time series forecasting, customer clustering, market basket analysis)
 - **Create real infrastructure** in your workflows (SQS, SNS, Pub/Sub, Firehose, Glue)
 - **Test against actual services** using LocalStack, Pub/Sub Emulator, or real cloud environments
+- **Automate model training** and predictions as part of your data pipelines
 - **Clean up automatically** with matching delete actions
 - **Move fast** with simple, focused actions that do one thing well
 
@@ -20,14 +22,14 @@ Want context-aware editing with inline documentation? Try **<a href="https://gat
 
 ## 🤔 Why Use These Actions?
 
-**"Why not just run `aws` or `gcloud` commands in a script step?"**
+**"Why not just run `aws` or `gcloud` commands in a script step? Or call ML APIs directly?"**
 
 Good question! Here's why actions are better:
 
 ### ✅ **Better Developer Experience**
-- **Type-safe inputs** - Catch mistakes before runtime
-- **Clear error messages** - Know exactly what went wrong, no cryptic cloud provider errors
-- **Self-documenting** - Your workflow explains what it does
+- **Type-safe inputs** - Catch mistakes before runtime (no more typos in column names or thresholds)
+- **Clear error messages** - Know exactly what went wrong, no cryptic cloud provider or API errors
+- **Self-documenting** - Your workflow explains what it does (both infrastructure and ML models)
 - **IDE support** - Autocomplete and validation in your editor
 
 ### ✅ **Cleaner Workflows**
@@ -36,7 +38,7 @@ Good question! Here's why actions are better:
 - run: |
     aws sqs create-queue --queue-name test-queue \
       --attributes VisibilityTimeout=60,MessageRetentionPeriod=345600 \
-      --tags Environment=test,Team=backend
+      --tags Environment=test Team=backend
     QUEUE_URL=$(aws sqs get-queue-url --queue-name test-queue --query 'QueueUrl' --output text)
     echo "queue_url=$QUEUE_URL" >> $GITHUB_OUTPUT
 
@@ -46,20 +48,21 @@ Good question! Here's why actions are better:
   with:
     queue-name: 'test-queue'
     visibility-timeout: '60'
+    message-retention-period: '345600'
     tags: '{"Environment": "test", "Team": "backend"}'
 ```
 
 ### ✅ **Consistent & Reusable**
-- Same patterns across all cloud services (AWS & GCP)
-- No need to remember CLI syntax for each service
+- Same patterns across all cloud services (AWS & GCP) and ML actions
+- No need to remember CLI syntax or API endpoints for each service
 - Copy examples from README, adapt, done
 - Works the same way in every repository
 
 ### ✅ **Built-in Best Practices**
 - Proper error handling and retries
-- Input validation before hitting cloud APIs
-- Output formatting ready for next steps
-- Emulator/LocalStack support out of the box
+- Input validation before hitting cloud APIs or training models
+- Output formatting ready for next steps (queue URLs, analysis IDs, model metrics)
+- Emulator/LocalStack support out of the box for infrastructure testing
 
 ### ✅ **No CLI Installation**
 - Actions use cloud SDKs directly (faster, smaller)
@@ -74,6 +77,12 @@ Good question! Here's why actions are better:
 - Active maintenance and updates
 
 ## 📦 Available Actions
+
+### 🤖 Machine Learning Analysis
+
+- **[predictr-forecast-analysis](https://github.com/predictr-io/predictr-forecast-analysis)** - Time series forecasting with Prophet (daily, weekly, hourly), holidays, seasonality, custom events, regressors
+- **[predictr-mba-analysis](https://github.com/predictr-io/predictr-mba-analysis)** - Market Basket Analysis to discover product associations and purchase patterns
+- **[predictr-rfm-clustering](https://github.com/predictr-io/predictr-rfm-clustering)** - Customer segmentation using RFM (Recency, Frequency, Monetary) clustering
 
 ### Amazon CloudWatch
 - **[aws-cloudwatch-put-metrics](https://github.com/predictr-io/aws-cloudwatch-put-metrics)** - Publish custom metrics (track deployments, build times, test results)
@@ -101,8 +110,67 @@ Good question! Here's why actions are better:
 - **[aws-firehose-delete-stream](https://github.com/predictr-io/aws-firehose-delete-stream)** - Clean up test streams
 
 ### AWS Glue
+- **[aws-glue-create-database](https://github.com/predictr-io/aws-glue-create-database)** / **[aws-glue-delete-database](https://github.com/predictr-io/aws-glue-delete-database)** - Data catalog databases
+- **[aws-glue-create-table](https://github.com/predictr-io/aws-glue-create-table)** / **[aws-glue-delete-table](https://github.com/predictr-io/aws-glue-delete-table)** - Data catalog tables
 - **[aws-glue-crawler](https://github.com/predictr-io/aws-glue-crawler)** - Run crawlers to discover & catalog data
 - **[aws-glue-partition-manager](https://github.com/predictr-io/aws-glue-partition-manager)** - Add, delete, check partition existence
+
+### AWS Athena
+- **[aws-athena-query](https://github.com/predictr-io/aws-athena-query)** - Run SQL queries on S3 data via Athena
+
+### Cloud Storage
+- **[aws-s3-create-bucket](https://github.com/predictr-io/aws-s3-create-bucket)** / **[aws-s3-delete-bucket](https://github.com/predictr-io/aws-s3-delete-bucket)** - S3 bucket management
+- **[gcs-create-bucket](https://github.com/predictr-io/gcs-create-bucket)** / **[gcs-delete-bucket](https://github.com/predictr-io/gcs-delete-bucket)** - GCS bucket management
+- **[url-to-s3](https://github.com/predictr-io/url_to_s3)** / **[url-to-gcs](https://github.com/predictr-io/url-to-gcs)** - Stream data from URLs to cloud storage
+
+## 💡 Examples
+
+### ML + Infrastructure: Complete Forecast Pipeline
+```yaml
+name: Daily Forecast Pipeline
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Create/update forecast
+      - name: Update Sales Forecast
+        id: forecast
+        uses: predictr-io/predictr-forecast-analysis@v0
+        with:
+          api-key: ${{ secrets.PREDICTR_API_KEY }}
+          organisation: my-company
+          analysis-name: daily-sales
+          connection-id: ${{ secrets.CONNECTION_ID }}
+          table-name: SALES_DATA
+          date-column: DATE
+          value-column: SALES
+          frequency: D
+          holidays: US
+
+      # 2. Send to downstream systems
+      - name: Notify via SQS
+        uses: predictr-io/aws-sqs-send-message@v0
+        with:
+          queue-url: ${{ secrets.QUEUE_URL }}
+          message-body: |
+            {
+              "analysis_id": "${{ steps.forecast.outputs.analysis-id }}",
+              "model_id": "${{ steps.forecast.outputs.model-id }}"
+            }
+
+      # 3. Track metrics
+      - name: Publish Metrics
+        uses: predictr-io/aws-cloudwatch-put-metrics@v0
+        with:
+          namespace: 'ML-Pipeline'
+          metrics: |
+            [{"metric_name": "ForecastCompleted", "value": 1, "unit": "Count"}]
+```
 
 ## 💡 Quick Example
 
@@ -202,9 +270,10 @@ jobs:
 
 ## 🎯 Design Principles
 
-- **Simple & Focused** - Each action does one thing well
-- **Test-Friendly** - Works with emulators and LocalStack out of the box
-- **Production-Ready** - All actions work with real cloud environments too
+- **Simple & Focused** - Each action does one thing well (build a model, create a queue, etc.)
+- **ML + Infrastructure** - Combine machine learning with cloud infrastructure in the same workflow
+- **Test-Friendly** - Infrastructure actions work with emulators and LocalStack out of the box
+- **Production-Ready** - All actions work with real cloud environments and production ML pipelines
 - **Clean Workflows** - Matching create/delete actions for easy cleanup
 - **Multi-Cloud** - Same patterns across AWS and GCP services
 
@@ -222,4 +291,4 @@ All actions are MIT licensed. Use them freely!
 
 ---
 
-Built with ☕ for teams who ship data products.
+Built with ☕ for teams who ship ML-powered data products.
