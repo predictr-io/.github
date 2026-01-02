@@ -7,9 +7,9 @@ GitHub Actions for creating **machine learning analyses** (forecasting, customer
 ## 🚀 What We Build
 
 Production-grade GitHub Actions that let you:
-- **Build ML analyses** in your workflows (time series forecasting, customer clustering, market basket analysis)
 - **Create real infrastructure** in your workflows (SQS, SNS, Pub/Sub, Firehose, Glue)
 - **Test against actual services** using LocalStack, Pub/Sub Emulator, or real cloud environments
+- **Build ML analyses** via predictr.io (time series forecasting, customer clustering, market basket analysis)
 - **Automate model training** and predictions as part of your data pipelines
 - **Clean up automatically** with matching delete actions
 - **Move fast** with simple, focused actions that do one thing well
