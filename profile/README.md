@@ -16,9 +16,9 @@ Production-grade GitHub Actions that let you:
 
 ## ✨ Workflow Editor
 
-<a href="https://gate.predictr.io" target="_blank"><img src="https://gate.predictr.io/gate.png" alt="GATE" height="60" align="left" style="margin-right: 15px;"></a>
+<a href="https://github.com/marketplace/actions-editor" target="_blank"><img src="https://gate.predictr.io/gate.png" alt="GATE" height="60" align="left" style="margin-right: 15px;"></a>
 
-Want context-aware editing with inline documentation? Try **<a href="https://gate.predictr.io" target="_blank">gate.predictr.io</a>** - a specialized editor for GitHub Actions workflows with built-in parameter documentation and action discovery.
+Want context-aware editing with inline documentation? Try **<a href="https://github.com/marketplace/actions-editor" target="_blank">Actions Editor</a>** - a specialized editor for GitHub Actions workflows with built-in parameter documentation and action discovery.
 
 ## 🤔 Why Use These Actions?
 
